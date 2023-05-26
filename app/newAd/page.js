@@ -32,6 +32,9 @@ const NewAd = () => {
           imageUrl: ad.imageUrl,
           city: ad.city,
         }),
+        headers: {
+          "Content-type": "application/json",
+        },
       });
 
       if (response.ok) {

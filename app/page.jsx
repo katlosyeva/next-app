@@ -4,47 +4,49 @@ import { useState } from 'react'
 import Search from '@components/Search'
 import Categories from '@components/Categories'
 import Ad from '@components/Ad'
-
+import Pagination from '@components/Pagination'
+import { useSearchParams } from 'next/navigation';
+import Sorting from '@components/Sorting'
+ 
  const Home = () => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [city, setCity] = useState("");
   const [queryWord, setQueryWord] = useState("");
-  const [category, setCategory] =useState("")
-
-
-  
+  const [category, setCategory] = useState("")
+  // const [page, setPage] = useState()
+  const searchParams = useSearchParams();
+ 
+  const page = searchParams.get('page');
+  const sorting = searchParams.get('sorting');
+ console.log(sorting);
+ 
+ 
   useEffect(() => {
     setLoading(true);
-    let url;
-    if(category){
-      url ='api/getAds?category=' + category;
-    }else if(queryWord&&city){
-      url ='api/getAds?city=' + city +'&queryWord=' + queryWord;
-      }else if(queryWord===null&&city){
-        url ='api/getAds?city=' + city;
-      }else if(queryWord&&city===null){
-        url ='api/getAds?queryWord=' + queryWord;
-      } else {
-        url = `api/getAds?category=${category}`;
-      }
-    
-    // const url = category ? 'api/getAds?category=' + category: 'api/getAds';
+    const url = `api/getAds?category=${category}&city=${city}&queryWord=${queryWord}&page=${page||1}${sorting?`&sorting=${sorting}`:""}`;
+
+   console.log("url", url)
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
+      
         setData(data);
         setLoading(false);
       });
   }, [category, queryWord, city]);
-     
+    const total_num = data&&data[0].full_count;
+    const prod_per_page = 2;
+    const pagesAmount = Math.ceil(data&&data[0].full_count/2);
 
   return (
 
   <section>
-      <Search setCity={setCity} setQueryWord={setQueryWord}/>
-      <Categories setCategory={setCategory}/>
+      <Search setCity={setCity} setQueryWord={setQueryWord} setCategory={setCategory} queryWord={queryWord} />
+      <Categories setCategory={setCategory} setCity={setCity} setQueryWord={setQueryWord} category={category} />
+      <Sorting sorting={sorting}/>
       <Ad response = {data}/>
+      <Pagination  pagesAmount={pagesAmount} page={+page||1}/>
   </section>
   )
 }

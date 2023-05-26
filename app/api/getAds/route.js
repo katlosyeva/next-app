@@ -5,24 +5,31 @@ export async function GET(req, res) {
   const category = searchParams.get("category");
   const city = searchParams.get("city");
   const queryWord = searchParams.get("queryWord");
+  const page = searchParams.get("page");
+  const sorting = searchParams.get("sorting");
+  console.log(page, "page");
+  console.log("sorting", sorting);
   let query;
-  if (category) {
-    query = `SELECT * from ads WHERE ads.category = "${category}"`;
-  } else if (queryWord && city) {
-    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%" AND city = "${city}" `;
-  } else if (queryWord === null && city) {
-    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%" AND city = "${city}" `;
-  } else if (queryWord && city === null) {
-    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%"`;
+  if (category && queryWord === "" && city === "") {
+    query = `SELECT * from ads WHERE ads.category = "${category}" LIMIT 2 OFFSET 0`;
+  } else if (queryWord === "" && city && category) {
+    query = `SELECT * from ads WHERE ads.city =  "${city}" AND ads.category = "${category}" LIMIT 2 OFFSET 0`;
+  } else if (queryWord && city === "" && category) {
+    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%" AND ads.category = "${category}" LIMIT 2 OFFSET 0`;
+  } else if (queryWord && city && category === "") {
+    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%" AND ads.city = "${city}" LIMIT 2 OFFSET 0`;
+  } else if (queryWord === "" && city && category === "") {
+    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%" AND ads.city = "${city}" LIMIT 2 OFFSET 0`;
+  } else if (queryWord && city === "" && category === "") {
+    query = `SELECT * from ads WHERE ads.title LIKE "%${queryWord}%" LIMIT 2 OFFSET 0`;
   } else {
-    query = `SELECT * from ads`;
+    query = `SELECT *, count(*) OVER() AS full_count FROM  ads ${
+      sorting ? `ORDER BY price ${query === "descending" ? "DESC" : "ASC"}` : ""
+    } LIMIT 2 OFFSET ${page * 2 - 2}`;
   }
-  console.log("query", query);
-  // const query = category
-  //   ? `SELECT * from ads WHERE ads.category = "${category}"`
-  //   : `SELECT * from ads`;
-  console.log("category", category);
+
+  console.log(query);
   const [values] = await db.execute(query);
-  // console.log("values", values);
+
   return new Response(JSON.stringify(values));
 }

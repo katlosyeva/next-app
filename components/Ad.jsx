@@ -8,12 +8,54 @@ const data = [{id:1, title:"Pram in a red color", price:"35", phone:"0963496289"
 
 
  const Ad = ({response}) => {
-  console.log(response)
+ const colorHandler =(category)=>{
+  switch(category){
+  case "computers":
+    return "bg-green-300";
+    break;
+    case "cars":
+    return "bg-red-300";
+    break;
+    case "children":
+    return "bg-pink-300";
+    break;
+    case "animals":
+    return "bg-yellow-300";
+    break;
+    case "sport":
+    return "bg-fuchsia-300";
+    break;
+    default:
+      "bg-orange-300";
+
+  }
+ }
+
+//  const colorHandler =(category)=>{
+//   if(category==="computers"){
+//     return "bg-green-300"
+//   } else if(category==="cars") {
+//     return "bg-red-300"
+//   } else if(category==="children") {
+//     return "bg-pink-300"
+//   } else if(category==="animals") {
+//     return "bg-yellow-300"
+//   } else if(category==="sport") {
+//     return "bg-fuchsia-300"
+//   } else {
+//     return "bg-orange-300"
+//   }
+
+//  }
+
+
+
+
   return (
-    response && (<div className="py-10">
+    response && (<div className="pt-10">
 {response.map(ad=>
   <section  key={ad.id} className=" bg-white w-5/6 mx-auto mb-7 flex relative rounded-sm">
-    <p className="absolute -right-1 -top-1 bg-green-300 uppercase font-bold p-1 text-slate-600 text-xs rounded-sm">{ad.category}</p>
+    <p className={`absolute -right-1 -top-1 ${colorHandler(ad.category)}  font-bold p-1 text-slate-600 text-xs rounded-sm`}>{ad.category}</p>
 <Image src="https://www.pramcentre.co.uk/images/venicci-soft-3in1-black-chassis-denim-red-p5390-48309_image.jpg" width={250} height={250} alt="Item"/>
     <div>
     
